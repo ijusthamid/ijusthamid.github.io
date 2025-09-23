@@ -60,6 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
       this.initPortfolioPanel();
       this.initHoverToPlay();
       this.initCustomPlayer();
+      this.initLanguageSwitcher();
     },
 
     // -------------------------------------------------------
@@ -122,46 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
     },
 
     initScrollAnimations: function () {
-      gsap.utils.toArray(".project-section").forEach((section) => {
-        const media = section.querySelector(".project-media-wrapper");
-        const description = section.querySelector(
-          ".project-description-wrapper"
-        );
-
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: section,
-            start: "top 80%",
-            toggleActions: "play none none none",
-          },
-        });
-
-        const isReversed = section.querySelector(".layout-reverse");
-
-        if (isReversed) {
-          tl.from(media, {
-            xPercent: 100,
-            opacity: 0,
-            duration: 0.8,
-            ease: "power3.out",
-          }).from(
-            description,
-            { xPercent: -100, opacity: 0, duration: 0.8, ease: "power3.out" },
-            "-=0.6"
-          );
-        } else {
-          tl.from(media, {
-            xPercent: -100,
-            opacity: 0,
-            duration: 0.8,
-            ease: "power3.out",
-          }).from(
-            description,
-            { xPercent: 100, opacity: 0, duration: 0.8, ease: "power3.out" },
-            "-=0.6"
-          );
-        }
-      });
+      this.setupScrollAnimations("rtl"); // اجرای اولیه انیمیشن‌ها با جهت پیش‌فرض (فارسی)
     },
 
     /**
@@ -445,8 +407,6 @@ document.addEventListener("DOMContentLoaded", function () {
         },
       });
 
-      // ... (بقیه کدهای تابع بدون هیچ تغییری باقی می‌مانند)
-
       player.on("loadedmetadata", () => {
         const video = player.elements.video;
         if (video && video.videoWidth > 0) {
@@ -492,6 +452,103 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.key === "Escape" && modal.classList.contains("is-visible")) {
           closeModal();
         }
+      });
+    },
+    // در فایل script.js، این تابع جدید را به آبجکت App اضافه کنید
+
+    // این تابع را با نسخه قبلی جایگزین کنید
+    initLanguageSwitcher: function () {
+      const switcherButtons = document.querySelectorAll(
+        ".language-switcher button"
+      );
+
+      const switchLanguage = (lang) => {
+        const oldDirection = document.documentElement.dir;
+        const newDirection = lang === "fa" ? "rtl" : "ltr";
+
+        document.documentElement.setAttribute("lang", lang);
+        document.documentElement.setAttribute("dir", newDirection);
+
+        const elements = document.querySelectorAll("[data-translate-key]");
+        elements.forEach((element) => {
+          const key = element.dataset.translateKey;
+          const translation = translations[lang][key];
+          if (translation) {
+            element.innerHTML = translation;
+          }
+        });
+
+        localStorage.setItem("preferred_language", lang);
+
+        switcherButtons.forEach((button) => {
+          button.classList.toggle("active", button.dataset.lang === lang);
+        });
+
+        // اگر جهت صفحه تغییر کرده بود، انیمیشن‌ها را بازسازی کن
+        if (oldDirection !== newDirection) {
+          ScrollTrigger.getAll().forEach((t) => t.kill());
+          this.setupScrollAnimations(newDirection);
+          // رفرش کردن ScrollTrigger ضروری نیست چون kill کردن و ساختن دوباره، آن را بازسازی می‌کند
+        }
+      };
+
+      switcherButtons.forEach((button) => {
+        button.addEventListener("click", (event) => {
+          const selectedLang = event.target.dataset.lang;
+          switchLanguage(selectedLang);
+        });
+      });
+
+      const savedLang = localStorage.getItem("preferred_language") || "fa";
+      if (savedLang !== "fa") {
+        switchLanguage(savedLang);
+      }
+    },
+
+    // این تابع جدید را به آبجکت App اضافه کنید
+    setupScrollAnimations: function (direction) {
+      const isRTL = direction === "rtl";
+
+      gsap.utils.toArray(".project-section").forEach((section) => {
+        const media = section.querySelector(".project-media-wrapper");
+        const description = section.querySelector(
+          ".project-description-wrapper"
+        );
+
+        // از بین بردن انیمیشن‌های قبلی روی این عناصر برای جلوگیری از تداخل
+        gsap.killTweensOf([media, description]);
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        });
+
+        const isReversed = section.classList.contains("layout-reverse");
+
+        // انیمیشن ستون مدیا بر اساس جهت
+        let mediaFromX = isReversed ? (isRTL ? -100 : 100) : isRTL ? 100 : -100;
+        tl.from(media, {
+          xPercent: mediaFromX,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power3.out",
+        });
+
+        // انیمیشن ستون متن بر اساس جهت
+        let descFromX = isReversed ? (isRTL ? 100 : -100) : isRTL ? -100 : 100;
+        tl.from(
+          description,
+          {
+            xPercent: descFromX,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power3.out",
+          },
+          "-=0.6"
+        );
       });
     },
   };

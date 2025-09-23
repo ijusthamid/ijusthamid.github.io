@@ -1112,3 +1112,88 @@ html.is-modal-active,
 body.is-modal-active {
   overflow: hidden;
 }
+
+/* ======================================================= */
+/* 15. Independent Language Switcher
+/* ======================================================= */
+
+.language-switcher {
+  position: absolute;
+  top: 30px;
+  left: 50px; /* ✨ موقعیت در گوشه بالا سمت چپ */
+  z-index: 10; /* برای اطمینان از اینکه روی بقیه عناصر باشد */
+  display: flex;
+  gap: 10px;
+  background-color: rgba(26, 26, 46, 0.5);
+  backdrop-filter: blur(5px);
+  padding: 8px;
+  border-radius: 100px;
+}
+
+.language-switcher button {
+  background: transparent;
+  border: none;
+  color: #a0a0b8;
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 100px;
+  transition: all 0.3s ease;
+}
+
+.language-switcher button:hover {
+  color: #ffffff;
+}
+
+.language-switcher button.active {
+  background-color: var(--color-primary-dark);
+  color: #1a1a2e;
+}
+
+/* ======================================================= */
+/* 16. LTR (English Language) Styles
+/* ======================================================= */
+
+/* ۱. ابتدا متغیر فونت انگلیسی را تعریف می‌کنیم */
+:root {
+  --font-english: "Roboto", sans-serif;
+}
+
+/* ۲. حالا قوانین کلی را برای زمانی که سایت چپ‌چین است، بازنویسی می‌کنیم */
+html[dir="ltr"] body {
+  font-family: var(--font-english);
+  text-align: left; /* متن‌ها به صورت پیش‌فرض چپ‌چین شوند */
+}
+
+/* --- ۳. اصلاحات بخش Hero --- */
+html[dir="ltr"] .hero-content {
+  text-align: left; /* متن‌های داخل هیرو چپ‌چین شوند */
+  padding-right: 0; /* فاصله‌گذاری راست را حذف می‌کنیم */
+  padding-left: 8%; /* فاصله‌گذاری را به سمت چپ منتقل می‌کنیم */
+}
+
+html[dir="ltr"] .hero-cta-buttons {
+  justify-content: flex-start; /* دکمه‌ها را به سمت چپ منتقل می‌کنیم */
+}
+
+/* --- ۴. اصلاحات بخش‌های پروژه و درباره من --- */
+html[dir="ltr"] .project-description-wrapper,
+html[dir="ltr"] .about-text-wrapper {
+  text-align: left;
+}
+
+/* برای پاراگراف‌ها، جهت متن را هم چپ‌چین می‌کنیم تا چینش بهتری داشته باشند */
+html[dir="ltr"] p {
+  text-align: left;
+}
+
+/* --- ۵. اصلاحات پنل نمونه‌کارها --- */
+html[dir="ltr"] .panel-header h2,
+html[dir="ltr"] .panel-footer a {
+  text-align: left;
+}
+html[dir="ltr"] .site-footer {
+  text-align: center;
+}
