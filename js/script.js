@@ -1,27 +1,38 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // =======================================================
-  // ========= ۱. ثبت پلاگین‌های GSAP (یک بار در ابتدا) =========
-  // =======================================================
   gsap.registerPlugin(ScrollTrigger);
 
-  // =======================================================
-  // ========= ۲. تعریف ماژول اصلی برنامه (App) =========
-  // =======================================================
   const App = {
-    /**
-     * نقطه شروع اجرای کل اسکریپت
-     */
+    // ✨ ۱. شمارنده مودال‌های فعال را اضافه می‌کنیم
+    activeModalCount: 0,
+
+    // ✨ ۲. یک تابع متمرکز برای قفل کردن اسکرول می‌سازیم
+    lockScroll: function () {
+      if (this.activeModalCount === 0) {
+        // فقط بار اول که یک مودال باز می‌شود، کلاس را اضافه کن
+        document.documentElement.classList.add("is-modal-active");
+        document.body.classList.add("is-modal-active");
+      }
+      this.activeModalCount++;
+    },
+
+    // ✨ ۳. یک تابع متمرکز برای باز کردن قفل اسکرول می‌سازیم
+    unlockScroll: function () {
+      this.activeModalCount--;
+      if (this.activeModalCount <= 0) {
+        // فقط وقتی آخرین مودال بسته شد، کلاس را حذف کن
+        document.documentElement.classList.remove("is-modal-active");
+        document.body.classList.remove("is-modal-active");
+        this.activeModalCount = 0; // برای جلوگیری از اعداد منفی، ریست می‌کنیم
+      }
+    },
+
     init: function () {
       this.setupPreloader();
     },
 
-    /**
-     * تنظیم و اجرای انیمیشن ورودی Lottie
-     */
     setupPreloader: function () {
       const preloaderContainer = document.getElementById("lottie-preloader");
       if (!preloaderContainer) return;
-
       const lottieAnimation = lottie.loadAnimation({
         container: preloaderContainer,
         renderer: "svg",
@@ -29,20 +40,13 @@ document.addEventListener("DOMContentLoaded", function () {
         autoplay: true,
         path: "lottie/data.json",
       });
-
       lottieAnimation.addEventListener("complete", () => {
         const mainContent = document.getElementById("main-content");
         preloaderContainer.classList.add("loaded");
         mainContent.style.display = "block";
-
-        // پس از اتمام پریلودر، تمام قابلیت‌های اصلی سایت را اجرا می‌کنیم
         this.initMainFeatures();
       });
     },
-
-    /**
-     * این تابع تمام قابلیت‌ها و انیمیشن‌های اصلی صفحه را فراخوانی می‌کند
-     */
     initMainFeatures: function () {
       this.startContentAnimation();
       this.initParallax();
@@ -321,35 +325,31 @@ document.addEventListener("DOMContentLoaded", function () {
       const overlay = document.getElementById("portfolio-panel-overlay");
       const openBtn = document.getElementById("open-portfolio-panel");
       const closeBtn = document.getElementById("close-portfolio-panel");
-
       if (!overlay || !openBtn || !closeBtn) return;
 
       const openPanel = (e) => {
         e.preventDefault();
         overlay.classList.add("is-open");
+        // ✨ از تابع متمرکز جدید استفاده می‌کنیم
+        this.lockScroll();
       };
-
       const closePanel = () => {
         overlay.classList.remove("is-open");
+        // ✨ از تابع متمرکز جدید استفاده می‌کنیم
+        this.unlockScroll();
       };
 
       openBtn.addEventListener("click", openPanel);
       closeBtn.addEventListener("click", closePanel);
-
-      // جدید: بستن با کلیک روی خود overlay
       overlay.addEventListener("click", (e) => {
-        // فقط زمانی که روی خود پس‌زمینه کلیک شد، بسته شود
-        if (e.target === overlay) {
-          closePanel();
-        }
+        if (e.target === overlay) closePanel();
       });
-
       document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && overlay.classList.contains("is-open")) {
+        if (e.key === "Escape" && overlay.classList.contains("is-open"))
           closePanel();
-        }
       });
     },
+
     initHoverToPlay: function () {
       const portfolioItems = document.querySelectorAll(".portfolio-item");
 
@@ -406,8 +406,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     },
 
-    // در فایل script.js، این تابع را به طور کامل جایگزین کنید
-
     initCustomPlayer: function () {
       const modal = document.getElementById("video-modal");
       const modalContent = document.querySelector(".video-modal-content");
@@ -416,10 +414,26 @@ document.addEventListener("DOMContentLoaded", function () {
       const portfolioGrid = document.querySelector(".portfolio-grid");
 
       if (!modal || !modalContent || !videoPlayerElement || !portfolioGrid) {
+        console.error("One or more player elements are missing from the DOM.");
         return;
       }
 
       const player = new Plyr(videoPlayerElement, {
+        // ✨ شروع تغییرات: لیست دکمه‌های دلخواه را اینجا تعریف می‌کنیم
+        controls: [
+          "play-large", // دکمه بزرگ پخش در وسط
+          "play", // دکمه کوچک پخش/توقف در نوار کنترل
+          "progress", // نوار پیشرفت ویدیو
+          "current-time", // زمان فعلی ویدیو
+          "mute", // دکمه بی‌صدا کردن
+          "volume", // نوار کنترل ولوم
+          "captions", // دکمه زیرنویس
+          "settings", // منوی تنظیمات (سرعت و کیفیت)
+          "fullscreen", // دکمه تمام‌صفحه
+          // دکمه 'pip' از این لیست حذف شده است
+        ],
+        // ✨ پایان تغییرات
+
         i18n: {
           play: "پخش",
           pause: "توقف",
@@ -431,7 +445,8 @@ document.addEventListener("DOMContentLoaded", function () {
         },
       });
 
-      // ✨ منطق ساده‌شده: فقط یک کلاس را بر اساس ابعاد ویدیو اضافه/حذف می‌کنیم
+      // ... (بقیه کدهای تابع بدون هیچ تغییری باقی می‌مانند)
+
       player.on("loadedmetadata", () => {
         const video = player.elements.video;
         if (video && video.videoWidth > 0) {
@@ -444,7 +459,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       const openModal = (videoSrc) => {
-        document.body.classList.add("is-modal-open");
+        this.lockScroll();
         player.source = {
           type: "video",
           title: "نمونه کار",
@@ -455,14 +470,12 @@ document.addEventListener("DOMContentLoaded", function () {
       };
 
       const closeModal = () => {
-        document.body.classList.remove("is-modal-open");
+        this.unlockScroll();
         player.stop();
         modal.classList.remove("is-visible");
-        // ✨ در هنگام بستن، کلاس را حتما حذف می‌کنیم تا برای ویدیوی بعدی آماده باشد
         modalContent.classList.remove("is-vertical");
       };
 
-      // Event Listeners (بدون تغییر)
       portfolioGrid.addEventListener("click", (event) => {
         const portfolioItem = event.target.closest(".portfolio-item");
         if (portfolioItem && portfolioItem.dataset.videoSrc) {

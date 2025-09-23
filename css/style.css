@@ -1107,3 +1107,8 @@ body.is-modal-open {
   --plyr-tooltip-background: var(--color-bg-darker);
   --plyr-tooltip-color: var(--color-text-light);
 }
+
+html.is-modal-active,
+body.is-modal-active {
+  overflow: hidden;
+}
