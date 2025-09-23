@@ -1002,3 +1002,108 @@ p {
 .panel-footer a:hover {
   color: var(--color-primary-dark);
 }
+/* ======================================================= */
+/* 13. Stable & Simplified Video Modal CSS
+/* ======================================================= */
+
+/* --- Modal Container --- */
+.video-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 11000;
+  background-color: rgba(17, 17, 34, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.video-modal.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* The bounding box for our player */
+.video-modal-content {
+  position: relative;
+  width: 90%;
+  max-width: 1100px; /* Default for horizontal */
+  max-height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: max-width 0.4s ease;
+}
+
+/* --- The Player and its Aspect Ratio --- */
+.plyr {
+  width: 100%;
+  max-height: 100%;
+  aspect-ratio: 16 / 9; /* Default to horizontal */
+}
+
+/* This is the critical fix to override Plyr's default style */
+.plyr--video .plyr__video-wrapper {
+  padding-bottom: 0 !important;
+}
+
+/* This class switches the player to a vertical state */
+.video-modal-content.is-vertical .plyr {
+  aspect-ratio: 9 / 16;
+  max-width: 450px; /* Sensible max-width for vertical videos */
+}
+
+/* --- Other Styles --- */
+.plyr__video-wrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.video-modal-close-btn {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  z-index: 10;
+  background: rgba(17, 17, 34, 0.7);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  color: #fff;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.3s ease;
+}
+.video-modal-close-btn:hover {
+  opacity: 1;
+  transform: rotate(90deg) scale(1.1);
+}
+
+body.is-modal-open {
+  overflow: hidden;
+}
+
+/* ======================================================= */
+/* 14. Player Color Scheme Customization
+/* ======================================================= */
+
+:root {
+  /* ✨ رنگ اصلی پلیر (نوار پیشرفت، دکمه‌ها و ...) */
+  --plyr-color-main: var(--color-primary-dark); /* #9b59b6 */
+
+  /* رنگ پس‌زمینه نوار کنترل‌ها */
+  --plyr-control-background: rgba(17, 17, 34, 0.7);
+
+  /* رنگ تولتیپ (پاپ‌آپ کوچک هنگام هاور) */
+  --plyr-tooltip-background: var(--color-bg-darker);
+  --plyr-tooltip-color: var(--color-text-light);
+}

@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
       this.initScrollParallax();
       this.initPortfolioPanel();
       this.initHoverToPlay();
+      this.initCustomPlayer();
     },
 
     // -------------------------------------------------------
@@ -402,6 +403,82 @@ document.addEventListener("DOMContentLoaded", function () {
             ); // {once: true} باعث می‌شود این listener فقط یک بار اجرا شود
           }
         });
+      });
+    },
+
+    // در فایل script.js، این تابع را به طور کامل جایگزین کنید
+
+    initCustomPlayer: function () {
+      const modal = document.getElementById("video-modal");
+      const modalContent = document.querySelector(".video-modal-content");
+      const closeBtn = document.getElementById("video-modal-close");
+      const videoPlayerElement = document.getElementById("portfolio-player");
+      const portfolioGrid = document.querySelector(".portfolio-grid");
+
+      if (!modal || !modalContent || !videoPlayerElement || !portfolioGrid) {
+        return;
+      }
+
+      const player = new Plyr(videoPlayerElement, {
+        i18n: {
+          play: "پخش",
+          pause: "توقف",
+          fullscreen: "تمام صفحه",
+          settings: "تنظیمات",
+          pip: "تصویر در تصویر",
+          mute: "بی‌صدا",
+          unmute: "باصدا",
+        },
+      });
+
+      // ✨ منطق ساده‌شده: فقط یک کلاس را بر اساس ابعاد ویدیو اضافه/حذف می‌کنیم
+      player.on("loadedmetadata", () => {
+        const video = player.elements.video;
+        if (video && video.videoWidth > 0) {
+          if (video.videoHeight > video.videoWidth) {
+            modalContent.classList.add("is-vertical");
+          } else {
+            modalContent.classList.remove("is-vertical");
+          }
+        }
+      });
+
+      const openModal = (videoSrc) => {
+        document.body.classList.add("is-modal-open");
+        player.source = {
+          type: "video",
+          title: "نمونه کار",
+          sources: [{ src: videoSrc, type: "video/mp4" }],
+        };
+        modal.classList.add("is-visible");
+        player.play();
+      };
+
+      const closeModal = () => {
+        document.body.classList.remove("is-modal-open");
+        player.stop();
+        modal.classList.remove("is-visible");
+        // ✨ در هنگام بستن، کلاس را حتما حذف می‌کنیم تا برای ویدیوی بعدی آماده باشد
+        modalContent.classList.remove("is-vertical");
+      };
+
+      // Event Listeners (بدون تغییر)
+      portfolioGrid.addEventListener("click", (event) => {
+        const portfolioItem = event.target.closest(".portfolio-item");
+        if (portfolioItem && portfolioItem.dataset.videoSrc) {
+          event.preventDefault();
+          openModal(portfolioItem.dataset.videoSrc);
+        }
+      });
+
+      closeBtn.addEventListener("click", closeModal);
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal.classList.contains("is-visible")) {
+          closeModal();
+        }
       });
     },
   };
