@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
       this.initHueShiftEffect();
       this.initScrollParallax();
       this.initPortfolioPanel();
+      this.initHoverToPlay();
     },
 
     // -------------------------------------------------------
@@ -346,6 +347,61 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.key === "Escape" && overlay.classList.contains("is-open")) {
           closePanel();
         }
+      });
+    },
+    initHoverToPlay: function () {
+      const portfolioItems = document.querySelectorAll(".portfolio-item");
+
+      portfolioItems.forEach((item) => {
+        // وقتی ماوس وارد آیتم می‌شود
+        item.addEventListener("mouseenter", () => {
+          if (item.querySelector("video")) return; // جلوگیری از اجرای دوباره
+
+          const videoSrc = item.dataset.videoSrc;
+          if (!videoSrc) return;
+
+          const videoPreview = document.createElement("video");
+          videoPreview.src = videoSrc;
+          videoPreview.autoplay = true;
+          videoPreview.muted = true;
+          videoPreview.loop = true;
+          videoPreview.playsInline = true;
+          videoPreview.className = "portfolio-video-preview";
+
+          // ۱. منتظر می‌مانیم تا ویدیو آماده پخش شود
+          videoPreview.addEventListener("canplay", function onCanPlay() {
+            // ۲. ویدیو را به صفحه اضافه می‌کنیم (هنوز نامرئی است)
+            item.appendChild(videoPreview);
+
+            // ۳. با یک تاخیر بسیار کوتاه، کلاس را اضافه می‌کنیم تا انیمیشن fade-in اجرا شود
+            setTimeout(() => {
+              videoPreview.classList.add("is-playing");
+            }, 10); // این تاخیر کوتاه برای اجرای صحیح انیمیشن ضروری است
+
+            videoPreview.removeEventListener("canplay", onCanPlay);
+          });
+        });
+
+        // وقتی ماوس از آیتم خارج می‌شود
+        item.addEventListener("mouseleave", () => {
+          const video = item.querySelector(".portfolio-video-preview");
+          if (video) {
+            // ۱. کلاس را حذف می‌کنیم تا انیمیشن fade-out اجرا شود
+            video.classList.remove("is-playing");
+
+            // ۲. منتظر می‌مانیم تا انیمیشن تمام شود
+            video.addEventListener(
+              "transitionend",
+              () => {
+                // ۳. بعد از اتمام انیمیشن، ویدیو را به طور کامل حذف می‌کنیم
+                if (video.parentNode) {
+                  video.remove();
+                }
+              },
+              { once: true }
+            ); // {once: true} باعث می‌شود این listener فقط یک بار اجرا شود
+          }
+        });
       });
     },
   };
