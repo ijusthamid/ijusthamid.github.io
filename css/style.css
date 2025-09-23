@@ -665,3 +665,126 @@ h1, h2, h3, h4, p {
         text-align: center;
     }
 }
+
+
+
+/* ======================================================= */
+/* 11. Portfolio Panel
+/* ======================================================= */
+#portfolio-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 90vh; /* 90% ارتفاع صفحه */
+    background-color: rgba(244, 244, 249, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 10000;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%); /* در حالت اولیه پایین صفحه مخفی است */
+    transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+#portfolio-panel.is-open {
+    transform: translateY(0);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    flex-shrink: 0; /* جلوگیری از کوچک شدن هدر */
+}
+
+.panel-header h2 {
+    font-size: 1.5rem;
+    color: var(--color-bg-darker);
+}
+
+.panel-close-btn {
+    background: none;
+    border: none;
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.panel-close-btn:hover {
+    color: var(--color-bg-darker);
+}
+
+.panel-content {
+    flex-grow: 1; /* تمام فضای باقی‌مانده را بگیرد */
+    overflow-y: auto; /* اسکرول در صورت نیاز */
+    padding: 2rem;
+}
+
+.portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.portfolio-item {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    aspect-ratio: 16 / 9; /* حفظ نسبت تصویر 16:9 */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.portfolio-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.portfolio-item:hover img {
+    transform: scale(1.05);
+}
+
+.portfolio-item-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(17, 17, 34, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 3rem;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.portfolio-item:hover .portfolio-item-overlay {
+    opacity: 1;
+}
+
+.panel-footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-bottom: 1rem;
+}
+
+.panel-footer a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.3s ease;
+}
+.panel-footer a:hover {
+    color: var(--color-primary-dark);
+}

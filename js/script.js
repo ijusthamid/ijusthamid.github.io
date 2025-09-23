@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function() {
             this.initEmailClipboard();
             this.initHueShiftEffect();
             this.initScrollParallax();
+            this.initPortfolioPanel();
         },
 
         // -------------------------------------------------------
@@ -264,8 +265,37 @@ document.addEventListener("DOMContentLoaded", function() {
                     },
                 });
             });
-        }
+        },
+
+        initPortfolioPanel: function() {
+    const panel = document.getElementById('portfolio-panel');
+    const openBtn = document.getElementById('open-portfolio-panel');
+    const closeBtn = document.getElementById('close-portfolio-panel');
+
+    if (!panel || !openBtn || !closeBtn) return;
+
+    const openPanel = (e) => {
+        e.preventDefault();
+        panel.classList.add('is-open');
     };
+
+    const closePanel = () => {
+        panel.classList.remove('is-open');
+    };
+
+    openBtn.addEventListener('click', openPanel);
+    closeBtn.addEventListener('click', closePanel);
+
+    // بستن پنل با دکمه Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && panel.classList.contains('is-open')) {
+            closePanel();
+        }
+    });
+},
+    };
+
+    
 
     // =======================================================
     // ========= ۳. اجرای برنامه =========
