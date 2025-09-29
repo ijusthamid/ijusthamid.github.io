@@ -2,31 +2,53 @@ document.addEventListener("DOMContentLoaded", function () {
   gsap.registerPlugin(ScrollTrigger);
 
   const App = {
-    // ✨ ۱. شمارنده مودال‌های فعال را اضافه می‌کنیم
+    currentLang: "fa",
     activeModalCount: 0,
 
-    // ✨ ۲. یک تابع متمرکز برای قفل کردن اسکرول می‌سازیم
+    applyInitialLanguageAndDirection: function () {
+      const savedLang = localStorage.getItem("preferred_language") || "fa";
+      this.currentLang = savedLang;
+      if (savedLang === "en") {
+        document.documentElement.lang = "en";
+        document.documentElement.dir = "ltr";
+      }
+    },
+
+    applyTranslations: function (lang) {
+      const elements = document.querySelectorAll("[data-translate-key]");
+      elements.forEach((element) => {
+        const key = element.dataset.translateKey;
+        if (translations[lang] && translations[lang][key]) {
+          element.innerHTML = translations[lang][key];
+        }
+      });
+
+      const switcherButtons = document.querySelectorAll(
+        ".language-switcher button"
+      );
+      switcherButtons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.lang === lang);
+      });
+    },
     lockScroll: function () {
       if (this.activeModalCount === 0) {
-        // فقط بار اول که یک مودال باز می‌شود، کلاس را اضافه کن
         document.documentElement.classList.add("is-modal-active");
         document.body.classList.add("is-modal-active");
       }
       this.activeModalCount++;
     },
 
-    // ✨ ۳. یک تابع متمرکز برای باز کردن قفل اسکرول می‌سازیم
     unlockScroll: function () {
       this.activeModalCount--;
       if (this.activeModalCount <= 0) {
-        // فقط وقتی آخرین مودال بسته شد، کلاس را حذف کن
         document.documentElement.classList.remove("is-modal-active");
         document.body.classList.remove("is-modal-active");
-        this.activeModalCount = 0; // برای جلوگیری از اعداد منفی، ریست می‌کنیم
+        this.activeModalCount = 0;
       }
     },
 
     init: function () {
+      this.applyInitialLanguageAndDirection();
       this.setupPreloader();
     },
 
@@ -48,10 +70,14 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     },
     initMainFeatures: function () {
+      const initialDirection = this.currentLang === "fa" ? "rtl" : "ltr";
+
+      this.applyTranslations(this.currentLang);
+
       this.startContentAnimation();
       this.initParallax();
-      this.initScrollAnimations();
-      this.initScrollProgressBar(); // <-- این تابع به نسخه اصلی شما بازگشت
+      this.initScrollAnimations(initialDirection);
+      this.initScrollProgressBar();
       this.initVanillaTilt();
       this.initParticleClickEffect();
       this.initEmailClipboard();
@@ -64,19 +90,29 @@ document.addEventListener("DOMContentLoaded", function () {
     },
 
     // -------------------------------------------------------
-    // --------- تعریف توابع مربوط به انیمیشن و قابلیت‌ها ---------
+    // ---------Defining animation and feature functions------
     // -------------------------------------------------------
 
     startContentAnimation: function () {
       const tl = gsap.timeline();
-      tl.from("#hero-title-svg", {
+
+      const titleSelector =
+        document.documentElement.dir === "rtl"
+          ? "#hero-title-fa"
+          : "#hero-title-en";
+      const subtitleSelector =
+        document.documentElement.dir === "rtl"
+          ? "#hero-subtitle-fa"
+          : "#hero-subtitle-en";
+
+      tl.from(titleSelector, {
         y: 100,
         opacity: 0,
         duration: 0.8,
         ease: "power3.out",
       });
       tl.from(
-        "#hero-subtitle-svg",
+        subtitleSelector,
         { y: 50, opacity: 0, duration: 0.8, ease: "power3.out" },
         "-=0.6"
       );
@@ -122,13 +158,10 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     },
 
-    initScrollAnimations: function () {
-      this.setupScrollAnimations("rtl"); // اجرای اولیه انیمیشن‌ها با جهت پیش‌فرض (فارسی)
+    initScrollAnimations: function (direction) {
+      this.setupScrollAnimations(direction);
     },
 
-    /**
-     * تابع نوار پیشرفت اسکرول به نسخه اصلی و بدون باگ شما بازگردانده شد
-     */
     initScrollProgressBar: function () {
       const progressBar = document.getElementById("scroll-progress-bar");
       if (!progressBar) return;
@@ -139,10 +172,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const clientHeight = document.documentElement.clientHeight;
 
         const scrollableHeight = scrollHeight - clientHeight;
-        // مقدار اسکرول را به صورت یک عدد بین ۰ تا ۱ محاسبه می‌کنیم
         const scrollValue = scrollTop / scrollableHeight;
 
-        // مقیاس افقی (scaleX) را برای پر شدن از مرکز تغییر می‌دهیم
         progressBar.style.transform = `scaleX(${scrollValue})`;
       });
     },
@@ -292,12 +323,10 @@ document.addEventListener("DOMContentLoaded", function () {
       const openPanel = (e) => {
         e.preventDefault();
         overlay.classList.add("is-open");
-        // ✨ از تابع متمرکز جدید استفاده می‌کنیم
         this.lockScroll();
       };
       const closePanel = () => {
         overlay.classList.remove("is-open");
-        // ✨ از تابع متمرکز جدید استفاده می‌کنیم
         this.unlockScroll();
       };
 
@@ -316,9 +345,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const portfolioItems = document.querySelectorAll(".portfolio-item");
 
       portfolioItems.forEach((item) => {
-        // وقتی ماوس وارد آیتم می‌شود
         item.addEventListener("mouseenter", () => {
-          if (item.querySelector("video")) return; // جلوگیری از اجرای دوباره
+          if (item.querySelector("video")) return;
 
           const videoSrc = item.dataset.videoSrc;
           if (!videoSrc) return;
@@ -331,38 +359,31 @@ document.addEventListener("DOMContentLoaded", function () {
           videoPreview.playsInline = true;
           videoPreview.className = "portfolio-video-preview";
 
-          // ۱. منتظر می‌مانیم تا ویدیو آماده پخش شود
           videoPreview.addEventListener("canplay", function onCanPlay() {
-            // ۲. ویدیو را به صفحه اضافه می‌کنیم (هنوز نامرئی است)
             item.appendChild(videoPreview);
 
-            // ۳. با یک تاخیر بسیار کوتاه، کلاس را اضافه می‌کنیم تا انیمیشن fade-in اجرا شود
             setTimeout(() => {
               videoPreview.classList.add("is-playing");
-            }, 10); // این تاخیر کوتاه برای اجرای صحیح انیمیشن ضروری است
+            }, 10);
 
             videoPreview.removeEventListener("canplay", onCanPlay);
           });
         });
 
-        // وقتی ماوس از آیتم خارج می‌شود
         item.addEventListener("mouseleave", () => {
           const video = item.querySelector(".portfolio-video-preview");
           if (video) {
-            // ۱. کلاس را حذف می‌کنیم تا انیمیشن fade-out اجرا شود
             video.classList.remove("is-playing");
 
-            // ۲. منتظر می‌مانیم تا انیمیشن تمام شود
             video.addEventListener(
               "transitionend",
               () => {
-                // ۳. بعد از اتمام انیمیشن، ویدیو را به طور کامل حذف می‌کنیم
                 if (video.parentNode) {
                   video.remove();
                 }
               },
               { once: true }
-            ); // {once: true} باعث می‌شود این listener فقط یک بار اجرا شود
+            );
           }
         });
       });
@@ -381,20 +402,17 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       const player = new Plyr(videoPlayerElement, {
-        // ✨ شروع تغییرات: لیست دکمه‌های دلخواه را اینجا تعریف می‌کنیم
         controls: [
-          "play-large", // دکمه بزرگ پخش در وسط
-          "play", // دکمه کوچک پخش/توقف در نوار کنترل
-          "progress", // نوار پیشرفت ویدیو
-          "current-time", // زمان فعلی ویدیو
-          "mute", // دکمه بی‌صدا کردن
-          "volume", // نوار کنترل ولوم
-          "captions", // دکمه زیرنویس
-          "settings", // منوی تنظیمات (سرعت و کیفیت)
-          "fullscreen", // دکمه تمام‌صفحه
-          // دکمه 'pip' از این لیست حذف شده است
+          "play-large",
+          "play",
+          "progress",
+          "current-time",
+          "mute",
+          "volume",
+          "captions",
+          "settings",
+          "fullscreen",
         ],
-        // ✨ پایان تغییرات
 
         i18n: {
           play: "پخش",
@@ -454,58 +472,41 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
     },
-    // در فایل script.js، این تابع جدید را به آبجکت App اضافه کنید
 
-    // این تابع را با نسخه قبلی جایگزین کنید
     initLanguageSwitcher: function () {
       const switcherButtons = document.querySelectorAll(
         ".language-switcher button"
       );
 
       const switchLanguage = (lang) => {
-        const oldDirection = document.documentElement.dir;
+        if (lang === this.currentLang) return;
+
+        const oldDirection = this.currentLang === "fa" ? "rtl" : "ltr";
+        this.currentLang = lang;
         const newDirection = lang === "fa" ? "rtl" : "ltr";
 
-        document.documentElement.setAttribute("lang", lang);
-        document.documentElement.setAttribute("dir", newDirection);
-
-        const elements = document.querySelectorAll("[data-translate-key]");
-        elements.forEach((element) => {
-          const key = element.dataset.translateKey;
-          const translation = translations[lang][key];
-          if (translation) {
-            element.innerHTML = translation;
-          }
-        });
+        document.documentElement.lang = lang;
+        document.documentElement.dir = newDirection;
+        this.applyTranslations(lang);
 
         localStorage.setItem("preferred_language", lang);
 
-        switcherButtons.forEach((button) => {
-          button.classList.toggle("active", button.dataset.lang === lang);
-        });
-
-        // اگر جهت صفحه تغییر کرده بود، انیمیشن‌ها را بازسازی کن
         if (oldDirection !== newDirection) {
           ScrollTrigger.getAll().forEach((t) => t.kill());
           this.setupScrollAnimations(newDirection);
-          // رفرش کردن ScrollTrigger ضروری نیست چون kill کردن و ساختن دوباره، آن را بازسازی می‌کند
+
+          this.startContentAnimation();
         }
       };
 
       switcherButtons.forEach((button) => {
         button.addEventListener("click", (event) => {
           const selectedLang = event.target.dataset.lang;
-          switchLanguage(selectedLang);
+          switchLanguage.call(this, selectedLang);
         });
       });
-
-      const savedLang = localStorage.getItem("preferred_language") || "fa";
-      if (savedLang !== "fa") {
-        switchLanguage(savedLang);
-      }
     },
 
-    // این تابع جدید را به آبجکت App اضافه کنید
     setupScrollAnimations: function (direction) {
       const isRTL = direction === "rtl";
 
@@ -515,7 +516,11 @@ document.addEventListener("DOMContentLoaded", function () {
           ".project-description-wrapper"
         );
 
-        // از بین بردن انیمیشن‌های قبلی روی این عناصر برای جلوگیری از تداخل
+        if (section.classList.contains("animation-completed")) {
+          gsap.set([media, description], { opacity: 1, xPercent: 0 });
+          return;
+        }
+
         gsap.killTweensOf([media, description]);
 
         const tl = gsap.timeline({
@@ -524,11 +529,13 @@ document.addEventListener("DOMContentLoaded", function () {
             start: "top 80%",
             toggleActions: "play none none none",
           },
+          onComplete: () => {
+            section.classList.add("animation-completed");
+          },
         });
 
         const isReversed = section.classList.contains("layout-reverse");
 
-        // انیمیشن ستون مدیا بر اساس جهت
         let mediaFromX = isReversed ? (isRTL ? -100 : 100) : isRTL ? 100 : -100;
         tl.from(media, {
           xPercent: mediaFromX,
@@ -537,7 +544,6 @@ document.addEventListener("DOMContentLoaded", function () {
           ease: "power3.out",
         });
 
-        // انیمیشن ستون متن بر اساس جهت
         let descFromX = isReversed ? (isRTL ? 100 : -100) : isRTL ? -100 : 100;
         tl.from(
           description,
@@ -553,8 +559,5 @@ document.addEventListener("DOMContentLoaded", function () {
     },
   };
 
-  // =======================================================
-  // ========= ۳. اجرای برنامه =========
-  // =======================================================
   App.init();
 });

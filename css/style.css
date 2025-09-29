@@ -1,5 +1,5 @@
 /* ======================================================= */
-/* ۱. تنظیمات کلی، متغیرها و فونت
+/* 1. General settings, variables and fonts
 /* ======================================================= */
 
 :root {
@@ -53,7 +53,7 @@ p {
 }
 
 /* ======================================================= */
-/* ۲. صفحه ورودی Lottie Preloader
+/* 2. Lottie Preloader Login Page
 /* ======================================================= */
 
 #lottie-preloader {
@@ -119,7 +119,7 @@ p {
 }
 
 /* ======================================================= */
-/* ۳. بخش Hero
+/* 3. Hero section
 /* ======================================================= */
 
 .hero {
@@ -191,7 +191,7 @@ p {
 }
 
 /* ======================================================= */
-/* ۴. دکمه‌های بخش Hero
+/* 4. Hero section buttons
 /* ======================================================= */
 
 .hero-cta-buttons {
@@ -308,7 +308,7 @@ p {
 }
 
 /* ======================================================= */
-/* ۵. بخش نمونه کارها (Portfolio)
+/* 5. Portfolio section
 /* ======================================================= */
 
 .project-section {
@@ -336,12 +336,10 @@ p {
   flex: 1;
 }
 
-/* ستون متن: بهش وزن بیشتری می‌دیم تا فضای بیشتری بگیره */
 .project-description-wrapper {
   flex: 1.5;
 }
 
-/* ستون مدیا: وزن کمتری داره و اندازه‌اش ثابت می‌مونه */
 .project-media-wrapper {
   flex: 1;
   max-width: 550px;
@@ -416,7 +414,7 @@ p {
 }
 
 /* ======================================================= */
-/* ۶. بخش درباره من (About)
+/* 6. About Me section
 /* ======================================================= */
 
 .about-section {
@@ -506,7 +504,7 @@ p {
 }
 
 /* ======================================================= */
-/* ۷. فوتر (Footer)
+/* 7. Footer
 /* ======================================================= */
 
 .site-footer {
@@ -630,6 +628,7 @@ p {
   font-size: 0.9rem;
   color: var(--color-text-muted);
   opacity: 0.8;
+  text-align: center;
 }
 
 /* Email Copy Tooltip */
@@ -648,7 +647,7 @@ p {
 }
 
 /* ======================================================= */
-/* ۸. ابزارها (Utilities)
+/* 8. Utilities
 /* ======================================================= */
 
 #scroll-progress-container {
@@ -675,7 +674,7 @@ p {
 }
 
 /* ======================================================= */
-/* ۹. انیمیشن‌ها (Keyframes)
+/* 9. Animations (Keyframes)
 /* ======================================================= */
 
 @keyframes moveGradient {
@@ -782,12 +781,11 @@ p {
 }
 
 /* ======================================================= */
-/* ۱۰. واکنش‌گرایی (Responsive Design)
+/* 10. Responsive Design
 /* ======================================================= */
 
 @media (max-width: 768px) {
   /* --- Hero Section --- */
-  /* کد جدید برای وسط‌چین کردن کل محتوای هیرو */
   .hero {
     justify-content: center;
   }
@@ -817,7 +815,7 @@ p {
 
   /* --- Portfolio Section --- */
   .project-container {
-    flex-direction: column !important; /* Use !important to override inline styles if any */
+    flex-direction: column !important;
     gap: 2rem;
   }
 
@@ -1097,13 +1095,10 @@ body.is-modal-open {
 /* ======================================================= */
 
 :root {
-  /* ✨ رنگ اصلی پلیر (نوار پیشرفت، دکمه‌ها و ...) */
   --plyr-color-main: var(--color-primary-dark); /* #9b59b6 */
 
-  /* رنگ پس‌زمینه نوار کنترل‌ها */
   --plyr-control-background: rgba(17, 17, 34, 0.7);
 
-  /* رنگ تولتیپ (پاپ‌آپ کوچک هنگام هاور) */
   --plyr-tooltip-background: var(--color-bg-darker);
   --plyr-tooltip-color: var(--color-text-light);
 }
@@ -1120,8 +1115,8 @@ body.is-modal-active {
 .language-switcher {
   position: absolute;
   top: 30px;
-  left: 50px; /* ✨ موقعیت در گوشه بالا سمت چپ */
-  z-index: 10; /* برای اطمینان از اینکه روی بقیه عناصر باشد */
+  left: 50px;
+  z-index: 10;
   display: flex;
   gap: 10px;
   background-color: rgba(26, 26, 46, 0.5);
@@ -1156,37 +1151,34 @@ body.is-modal-active {
 /* 16. LTR (English Language) Styles
 /* ======================================================= */
 
-/* ۱. ابتدا متغیر فونت انگلیسی را تعریف می‌کنیم */
 :root {
   --font-english: "Roboto", sans-serif;
 }
 
-/* ۲. حالا قوانین کلی را برای زمانی که سایت چپ‌چین است، بازنویسی می‌کنیم */
 html[dir="ltr"] body {
   font-family: var(--font-english);
-  text-align: left; /* متن‌ها به صورت پیش‌فرض چپ‌چین شوند */
+  text-align: left;
 }
 
-/* --- ۳. اصلاحات بخش Hero --- */
+/* --- 3. Hero section fixes --- */
 html[dir="ltr"] .hero-content {
-  text-align: left; /* متن‌های داخل هیرو چپ‌چین شوند */
-  padding-right: 0; /* فاصله‌گذاری راست را حذف می‌کنیم */
-  padding-left: 8%; /* فاصله‌گذاری را به سمت چپ منتقل می‌کنیم */
+  text-align: left;
+  padding-right: 0;
+  padding-left: 8%;
 }
 
 html[dir="ltr"] .hero-cta-buttons {
-  justify-content: flex-start; /* دکمه‌ها را به سمت چپ منتقل می‌کنیم */
+  justify-content: flex-start;
 }
 
-/* --- ۴. اصلاحات بخش‌های پروژه و درباره من --- */
+/* --- 4. Project and About Me sections revisions --- */
 html[dir="ltr"] .project-description-wrapper,
 html[dir="ltr"] .about-text-wrapper {
   text-align: left;
 }
 
-/* برای پاراگراف‌ها، جهت متن را هم چپ‌چین می‌کنیم تا چینش بهتری داشته باشند */
-html[dir="ltr"] p {
-  text-align: left;
+html[dir="ltr"] .footer-copyright {
+  text-align: center;
 }
 
 /* --- ۵. اصلاحات پنل نمونه‌کارها --- */
@@ -1196,4 +1188,25 @@ html[dir="ltr"] .panel-footer a {
 }
 html[dir="ltr"] .site-footer {
   text-align: center;
+}
+
+/* In style.css, at the end of the file */
+
+/* --- SVG Language Toggling --- */
+/* Hide English parts by default (on RTL pages) */
+#hero-subtitle-en,
+#hero-title-en {
+  display: none;
+}
+
+/* When page is LTR, hide Persian parts */
+html[dir="ltr"] #hero-subtitle-fa,
+html[dir="ltr"] #hero-title-fa {
+  display: none;
+}
+
+/* When page is LTR, show English parts */
+html[dir="ltr"] #hero-subtitle-en,
+html[dir="ltr"] #hero-title-en {
+  display: block; /* Or 'inline' depending on SVG structure */
 }
